@@ -1,6 +1,9 @@
 const express = require('express')
+const cluster = require('cluster')
 
 const app = express()
+
+cluster.schedulingPolicy = cluster.SCHED_RR
 
 function delay(duration) {
     const startTime = Date.now()
@@ -10,7 +13,7 @@ function delay(duration) {
 }
 
 app.get('/', (req, res) => {
-    res.send('Performance Example')
+    res.send(`Performance Example: ${process.pid}`)
     //JSON.stringify({}) => "{}"
     //JSON.parse("{}") => {}
     //[5,2,3,4].sort() (for very large arrays or very large objects it can block our code)
@@ -18,7 +21,17 @@ app.get('/', (req, res) => {
 
 app.get('/timer', (req, res) => {
     delay(9000) //delay the response
-    res.send('Ding Ding Ding!')
+    res.send(`Ding Ding Ding: ${process.pid}`)
 })
 
-app.listen(3000)
+
+console.log("Running a server.")
+
+if (cluster.isMaster){
+    console.log('Master has been started...')
+    cluster.fork()
+    cluster.fork()
+} else {
+    console.log('Worker process started.')
+    app.listen(3000)
+}
