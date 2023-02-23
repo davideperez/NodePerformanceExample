@@ -4,7 +4,7 @@ const os = require('os')
 
 const app = express()
 
-cluster.schedulingPolicy = cluster.SCHED_RR
+cluster.schedulingPolicy = cluster.SCHED_RR // special line that make cluster work on windows.
 
 function delay(duration) {
     const startTime = Date.now()
